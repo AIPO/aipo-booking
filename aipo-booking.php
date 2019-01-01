@@ -13,6 +13,11 @@
 */
 
 defined( 'ABSPATH' ) or die( 'You can\'t access this file!!' );
+if ( file_exists( dirname( __FILE__ ) . '/vendor/autoload.php' ) ) {
+	require_once dirname( __FILE__ ) . '/vendor/autoload.php';
+}
+use Inc\Activate;
+use Inc\Deactivate;
 
 class AipoBooking {
 	public $plugin_name;
@@ -70,16 +75,18 @@ class AipoBooking {
 		wp_enqueue_script( 'mypluginstyle', plugins_url( '/assets/js/booking-style.js', __FILE__ ) );
 	}
 
+	public function activate(  ) {
+		Activate::activate();
+	}
+
 }//end class
 
 if ( class_exists( 'AipoBooking' ) ) {
 	$aipoBooking = new AipoBooking();
 	$aipoBooking->register();
-	$aipoBooking->register_admin_scripts();
 }
 //activation
-require_once plugin_dir_path( __FILE__ ) . 'inc/aipo-booking-activate.php';
-register_activation_hook( __FILE__, [ 'AipoBookingActivate', 'activate' ] );
+register_activation_hook( __FILE__, [ $aipoBooking, 'activate' ] );
 //deactivation
-require_once plugin_dir_path( __FILE__ ) . 'inc/aipo-booking-deactivate.php';
-register_deactivation_hook( __FILE__, [ 'AipoBookingDeactivate', 'deactivate' ] );
+
+register_deactivation_hook( __FILE__, [ 'Deactivate', 'deactivate' ] );
